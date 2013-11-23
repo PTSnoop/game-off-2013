@@ -1,5 +1,5 @@
-main:
-	g++ -g hello.cpp world.cpp -lwt -lwthttp -lboost_signals -lboost_thread
+main: hello.o world.o score.o circle.o
+	g++ -g hello.o world.o score.o circle.o -lwt -lwthttp -lboost_signals -lboost_thread
 
 refresh: main
 	./a.out --docroot . --http-address localhost --http-port 9090

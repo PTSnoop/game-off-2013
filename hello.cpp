@@ -11,6 +11,7 @@
 #include <Wt/WText>
 
 
+#include <Wt/WStandardItem>
 #include <Wt/WStandardItemModel>
 #include <Wt/WAbstractItemModel>
 #include <Wt/WAbstractItemView>
@@ -29,6 +30,7 @@
 #include <boost/thread.hpp>
 
 #include "world.h"
+#include "circle.h"
 
 using namespace std;
 using namespace Wt;
@@ -79,6 +81,37 @@ private:
 
 	Wt::EventSignal<>* m_UpdateEvent;
 
+	Wt::WContainerWidget* numberboxbox;
+	Wt::WVBoxLayout* numberboxboxlayout;
+	Wt::WContainerWidget* bigmoneybox;
+
+	Wt::WContainerWidget* circ1box;
+	SmallCircle* circ1;
+	Wt::WText* line1current;
+	Wt::WText* line1value;
+
+	Wt::WContainerWidget* circ2box;
+	SmallCircle* circ2;
+	Wt::WText* line2current;
+	Wt::WText* line2value;
+
+	Wt::WContainerWidget* circ3box;
+	SmallCircle* circ3;
+	Wt::WText* line3current;
+	Wt::WText* line3value;
+
+	Wt::WContainerWidget* circ4box;
+	SmallCircle* circ4;
+	Wt::WText* line4current;
+	Wt::WText* line4value;
+
+	Wt::WContainerWidget* circ5box;
+	SmallCircle* circ5;
+	Wt::WText* line5current;
+	Wt::WText* line5value;
+
+	Wt::WTimer *timer;
+
 	boost::thread m_UpdateThread;
 	boost::mutex m_UpdateMutex;
 	bool m_ThreadRunning;
@@ -108,10 +141,10 @@ HelloApplication::HelloApplication(const WEnvironment& env)
 	graphslayout->addWidget(graph1,0,0);
 	graph2 = new Wt::WContainerWidget();
 	graph2->setStyleClass("whitebox");
-	graphslayout->addWidget(graph2,0,1);
+	graphslayout->addWidget(graph2,1,0);
 	graph3 = new Wt::WContainerWidget();
 	graph3->setStyleClass("whitebox");
-	graphslayout->addWidget(graph3,1,0);
+	graphslayout->addWidget(graph3,0,1);
 	graph4 = new Wt::WContainerWidget();
 	graph4->setStyleClass("whitebox");
 	graphslayout->addWidget(graph4,1,1);
@@ -128,17 +161,71 @@ HelloApplication::HelloApplication(const WEnvironment& env)
 	sidebarlayout->setContentsMargins(10, 10, 10, 10);
 	sidebar->setLayout(sidebarlayout);
 
-	numberbox = new Wt::WContainerWidget();
-	numberbox->setStyleClass("whitebox");
-	sidebarlayout->addWidget(numberbox);
+	numberboxbox = new Wt::WContainerWidget();
+	numberboxbox->setStyleClass("whitebox");
+	sidebarlayout->addWidget(numberboxbox);
 
+	numberboxboxlayout = new Wt::WVBoxLayout();
+	numberboxboxlayout->setContentsMargins(10, 10, 10, 10);
+	numberboxbox->setLayout(numberboxboxlayout);
+	
+	numberbox = new Wt::WContainerWidget();
 	numberboxlayout = new Wt::WGridLayout();
 	numberboxlayout->setContentsMargins(10, 10, 10, 10);
 	numberbox->setLayout(numberboxlayout);
 
 	bigmoney = new Wt::WText(L"265.9");
-	numberboxlayout->addWidget(bigmoney,0,0);
-	bigmoney->setWidth("200px");
+	bigmoney->setStyleClass("bigmoney");
+	//bigmoneybox = new Wt::WContainerWidget();
+	//bigmoneybox->addWidget(bigmoney);
+	numberboxboxlayout->addWidget(bigmoney);//box);
+
+	numberboxboxlayout->addWidget(numberbox,1);
+
+	circ1box = new Wt::WContainerWidget();
+	circ1 = new SmallCircle(circ1box);
+	circ1->color = WColor(0xcb,0x2e,0x2e,255);
+	numberboxlayout->addWidget(circ1box,1,0,AlignCenter);
+	line1current = new Wt::WText(L"0.0");
+	numberboxlayout->addWidget(line1current,1,1,AlignCenter);
+	line1value = new Wt::WText(L"0.0");
+	numberboxlayout->addWidget(line1value,1,2,AlignCenter);
+
+	circ2box = new Wt::WContainerWidget();
+	circ2 = new SmallCircle(circ2box);
+	circ2->color = WColor(0x2f, 0xcb, 0x2e,255);
+	numberboxlayout->addWidget(circ2box,2,0,AlignCenter);
+	line2current = new Wt::WText(L"0.0");
+	numberboxlayout->addWidget(line2current,2,1,AlignCenter);
+	line2value = new Wt::WText(L"0.0");
+	numberboxlayout->addWidget(line2value,2,2,AlignCenter);
+
+	circ3box = new Wt::WContainerWidget();
+	circ3 = new SmallCircle(circ3box);
+	circ3->color = WColor(0x00, 0x45, 0x86,255);
+	numberboxlayout->addWidget(circ3box,3,0,AlignCenter);
+	line3current = new Wt::WText(L"0.0");
+	numberboxlayout->addWidget(line3current,3,1,AlignCenter);
+	line3value = new Wt::WText(L"0.0");
+	numberboxlayout->addWidget(line3value,3,2,AlignCenter);
+
+	circ4box = new Wt::WContainerWidget();
+	circ4 = new SmallCircle(circ4box);
+	circ4->color = WColor(0x2e, 0xc8, 0xce,255);
+	numberboxlayout->addWidget(circ4box,4,0,AlignCenter);
+	line4current = new Wt::WText(L"0.0");
+	numberboxlayout->addWidget(line4current,4,1,AlignCenter);
+	line4value = new Wt::WText(L"0.0");
+	numberboxlayout->addWidget(line4value,4,2,AlignCenter);
+
+	circ5box = new Wt::WContainerWidget();
+	circ5 = new SmallCircle(circ5box);
+	circ5->color = WColor(0x88,0x88,0x88,255);
+	numberboxlayout->addWidget(circ5box,5,0,AlignCenter);
+	line5current = new Wt::WText(L"1.0");
+	numberboxlayout->addWidget(line5current,5,1,AlignCenter);
+	line5value = new Wt::WText(L"500.0");
+	numberboxlayout->addWidget(line5value,5,2,AlignCenter);
 	
 	vspace = new Wt::WContainerWidget();
 	sidebarlayout->addWidget(vspace);
@@ -170,8 +257,7 @@ HelloApplication::HelloApplication(const WEnvironment& env)
 	graph1layout->setContentsMargins(0, 0, 0, 0);
 	graph1->setLayout(graph1layout);
 	graph1layout->addWidget(chart1,1);
-
-	pen.setColor(WColor(0x00, 0x45, 0x86,255));
+	pen.setColor(WColor(0x2f, 0xcb, 0x2e,255));
 	chart2 = new Wt::Chart::WCartesianChart();
 	chart2->setModel(model); 
 	chart2->setXSeriesColumn(0);
@@ -187,8 +273,8 @@ HelloApplication::HelloApplication(const WEnvironment& env)
 	graph2layout->setContentsMargins(0, 0, 0, 0);
 	graph2->setLayout(graph2layout);
 	graph2layout->addWidget(chart2,1);
+	pen.setColor(WColor(0x00, 0x45, 0x86,255));
 
-	pen.setColor(WColor(0x2f, 0xcb, 0x2e,255));
 	chart3 = new Wt::Chart::WCartesianChart();
 	chart3->setModel(model); 
 	chart3->setXSeriesColumn(0);
@@ -222,7 +308,7 @@ HelloApplication::HelloApplication(const WEnvironment& env)
 	graph4->setLayout(graph4layout);
 	graph4layout->addWidget(chart4,1);
 
-	Wt::WTimer *timer = new Wt::WTimer();
+	timer = new Wt::WTimer();
 	timer->setInterval(1000);
 	timer->timeout().connect(this, &HelloApplication::UpdateEvent);
 	timer->start();
@@ -260,15 +346,29 @@ void HelloApplication::UpdateEvent()
 {
 	ScrollGraphs();
 
-	char random [33];
-	sprintf(random,"%d",rand());
-	bigmoney->setText(Wt::WString(random));
+}
+
+void SetStandardItemLabel(Wt::WText* label, Wt::WStandardItem* item)
+{
+	std::string data1 = item->text().toUTF8();
+	float float1 = atof(data1.c_str());
+
+	char buffer [16];
+	sprintf(buffer,"%0.01f",float1);
+	label->setText(buffer);
+
+	
 }
 
 void HelloApplication::ScrollGraphs()
 {
 	g_World->Get(model);
-	chart1->refresh();
+
+	SetStandardItemLabel(line1current,model->item(99,1));
+	SetStandardItemLabel(line2current,model->item(99,2));
+	SetStandardItemLabel(line3current,model->item(99,3));
+	SetStandardItemLabel(line4current,model->item(99,4));
+	
 	//chart1->setModel(model);
 	//chart2->setModel(model);
 	//chart3->setModel(model);

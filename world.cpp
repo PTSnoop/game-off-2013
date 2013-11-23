@@ -14,8 +14,6 @@ World::~World()
 
 void World::init()
 {
-	printf("INIT\n");
-
 	long int currentEpoch;
 	time(&currentEpoch);
 	//currentEpoch -= 100;
@@ -62,14 +60,12 @@ void World::init()
 
 void World::Update(int frequency)
 {
-	printf("BEGIN\n");
 	m_ThreadRunning= true;
 
 	while (m_ThreadRunning)
 	{
 		if (m_ThreadRunning)
 		{
-			printf("Update\n");
 			boost::mutex::scoped_lock lock(m_UpdateMutex);
 
 			m_Times.pop_front();
@@ -100,10 +96,10 @@ void World::Get(Wt::WStandardItemModel* model)
 	// I could do with some asserts in here. Ah well.
 
     for (unsigned i = 0; i < 100; ++i) {
-		model->setData(i, 0, m_Line0[i]);
-		model->setData(i, 1, m_Line1[i]);
-		model->setData(i, 2, m_Line2[i]);
-		model->setData(i, 3, m_Line3[i]);
-		model->setData(i, 4, m_Line4[i]);
+		model->setData(i, 0, m_Line0[i]/10.0f);
+		model->setData(i, 1, m_Line1[i]/10.0f);
+		model->setData(i, 2, m_Line2[i]/10.0f);
+		model->setData(i, 3, m_Line3[i]/10.0f);
+		model->setData(i, 4, m_Line4[i]/10.0f);
     }
 }
