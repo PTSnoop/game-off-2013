@@ -1,9 +1,3 @@
-/*
-* Copyright (C) 2008 Emweb bvba, Heverlee, Belgium.
-*
-* See the LICENSE file for terms of use.
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -24,17 +18,13 @@
 #include <Wt/WShadow>
 #include <Wt/Chart/WCartesianChart>
 
-// c++0x only, for std::bind
-// #include <functional>
-
 #include <Wt/WPaintedWidget>
 #include <Wt/WPaintDevice>
 #include <Wt/WPainter>
 #include <Wt/WHBoxLayout>
 #include <Wt/WApplication>
 #include <Wt/WContainerWidget>
-
-//#include <Windows.h>
+#include <Wt/WTimer>
 
 #include <boost/thread.hpp>
 
@@ -49,6 +39,7 @@ class HelloApplication : public WApplication
 {
 public:
 	HelloApplication(const WEnvironment& env);
+	~HelloApplication();
 
 private:
 
@@ -73,8 +64,27 @@ private:
 	Wt::WContainerWidget* vspace;
 
 	Wt::WContainerWidget* controlsbox;
-/////
 
+	WStandardItemModel * model;
+
+	Wt::Chart::WCartesianChart *chart1;
+	Wt::Chart::WCartesianChart *chart2;
+	Wt::Chart::WCartesianChart *chart3;
+	Wt::Chart::WCartesianChart *chart4;
+
+	Wt::WVBoxLayout* graph1layout;
+	Wt::WVBoxLayout* graph2layout;
+	Wt::WVBoxLayout* graph3layout;
+	Wt::WVBoxLayout* graph4layout;
+
+	Wt::EventSignal<>* m_UpdateEvent;
+
+	boost::thread m_UpdateThread;
+	boost::mutex m_UpdateMutex;
+	bool m_ThreadRunning;
+	void Update(int);
+	void UpdateEvent();
+	void ScrollGraphs();
 };
 
 HelloApplication::HelloApplication(const WEnvironment& env)
@@ -128,6 +138,7 @@ HelloApplication::HelloApplication(const WEnvironment& env)
 
 	bigmoney = new Wt::WText(L"265.9");
 	numberboxlayout->addWidget(bigmoney,0,0);
+	bigmoney->setWidth("200px");
 	
 	vspace = new Wt::WContainerWidget();
 	sidebarlayout->addWidget(vspace);
@@ -136,42 +147,160 @@ HelloApplication::HelloApplication(const WEnvironment& env)
 	controlsbox->setStyleClass("whitebox");
 	sidebarlayout->addWidget(controlsbox);
 
+	model = new WStandardItemModel(100, 5, 0);
+	g_World->Get(model);
 
-  WStandardItemModel *model = new WStandardItemModel(40, 2, this);
-  model->setHeaderData(0, WString("X"));
-  model->setHeaderData(1, WString("Y = sin(X)"));
+	Wt::WPen pen;
+	pen.setWidth(2);
+	pen.setColor(WColor(0,0,0,255));
 
-  int j = 200;
+	pen.setColor(WColor(0xcb,0x2e,0x2e,255));
+	chart1 = new Wt::Chart::WCartesianChart();
+	chart1->setModel(model); 
+	chart1->setXSeriesColumn(0);
+	chart1->axis(Wt::Chart::XAxis).setVisible(false);
+	chart1->setType(Wt::Chart::ScatterPlot);
+	chart1->setPlotAreaPadding(5);
+	chart1->setPlotAreaPadding(40, Left);
+	Wt::Chart::WDataSeries s1(1, Wt::Chart::LineSeries);
+	s1.setPen(WPen(pen));
+	chart1->addSeries(s1);
 
-  for (unsigned i = 0; i < 40; ++i) {
-    
-    model->setData(i, 0, i);
-    model->setData(i, 1, j );
-    j = j - 10 + (rand()%20);
-  }
-
-	Wt::Chart::WCartesianChart *chart = new Wt::Chart::WCartesianChart();
-	chart->setModel(model); 
-	chart->setXSeriesColumn(0); 
-
-
-	chart->setType(Wt::Chart::ScatterPlot);
-
-	chart->setPlotAreaPadding(5);
-	chart->setPlotAreaPadding(30, Bottom);
-	chart->setPlotAreaPadding(50, Left);
-
-	Wt::Chart::WDataSeries s(1, Wt::Chart::LineSeries);
-	//s.setShadow(WShadow(3, 3, WColor(0, 0, 0, 127), 3));
-	chart->addSeries(s);
-
-	//chart->setMargin(10, Top | Bottom);
-	//chart->setMargin(WLength::Auto, Left | Right);
-
-	Wt::WVBoxLayout* graph1layout = new Wt::WVBoxLayout();
+	graph1layout = new Wt::WVBoxLayout();
 	graph1layout->setContentsMargins(0, 0, 0, 0);
 	graph1->setLayout(graph1layout);
-	graph1layout->addWidget(chart,1);
+	graph1layout->addWidget(chart1,1);
+
+	pen.setColor(WColor(0x00, 0x45, 0x86,255));
+	chart2 = new Wt::Chart::WCartesianChart();
+	chart2->setModel(model); 
+	chart2->setXSeriesColumn(0);
+	chart2->axis(Wt::Chart::XAxis).setVisible(false);
+	chart2->setType(Wt::Chart::ScatterPlot);
+	chart2->setPlotAreaPadding(5);
+	chart2->setPlotAreaPadding(40, Left);
+	Wt::Chart::WDataSeries s2(2, Wt::Chart::LineSeries);
+	s2.setPen(WPen(pen));
+	chart2->addSeries(s2);
+
+	graph2layout = new Wt::WVBoxLayout();
+	graph2layout->setContentsMargins(0, 0, 0, 0);
+	graph2->setLayout(graph2layout);
+	graph2layout->addWidget(chart2,1);
+
+	pen.setColor(WColor(0x2f, 0xcb, 0x2e,255));
+	chart3 = new Wt::Chart::WCartesianChart();
+	chart3->setModel(model); 
+	chart3->setXSeriesColumn(0);
+	chart3->axis(Wt::Chart::XAxis).setVisible(false);
+	chart3->setType(Wt::Chart::ScatterPlot);
+	chart3->setPlotAreaPadding(5);
+	chart3->setPlotAreaPadding(40, Left);
+	Wt::Chart::WDataSeries s3(3, Wt::Chart::LineSeries);
+	s3.setPen(WPen(pen));
+	chart3->addSeries(s3);
+
+	graph3layout = new Wt::WVBoxLayout();
+	graph3layout->setContentsMargins(0, 0, 0, 0);
+	graph3->setLayout(graph3layout);
+	graph3layout->addWidget(chart3,1);
+
+	pen.setColor(WColor(0x2e, 0xc8, 0xce,255));
+	chart4 = new Wt::Chart::WCartesianChart();
+	chart4->setModel(model); 
+	chart4->setXSeriesColumn(0);
+	chart4->axis(Wt::Chart::XAxis).setVisible(false);
+	chart4->setType(Wt::Chart::ScatterPlot);
+	chart4->setPlotAreaPadding(5);
+	chart4->setPlotAreaPadding(40, Left);
+	Wt::Chart::WDataSeries s4(4, Wt::Chart::LineSeries);
+	s4.setPen(WPen(pen));
+	chart4->addSeries(s4);
+
+	graph4layout = new Wt::WVBoxLayout();
+	graph4layout->setContentsMargins(0, 0, 0, 0);
+	graph4->setLayout(graph4layout);
+	graph4layout->addWidget(chart4,1);
+
+	Wt::WTimer *timer = new Wt::WTimer();
+	timer->setInterval(1000);
+	timer->timeout().connect(this, &HelloApplication::UpdateEvent);
+	timer->start();
+
+	//m_UpdateEvent = new EventSignal<>("EventSignal",this);
+	//m_UpdateEvent->connect(this, &HelloApplication::UpdateEvent);
+
+	//m_ThreadRunning = true;
+	//m_UpdateThread = boost::thread(boost::bind(&HelloApplication::Update, this, 1000));
+}
+
+void HelloApplication::Update(int frequency)
+{
+	m_ThreadRunning= true;
+
+	Wt::WApplication* app = Wt::WApplication::instance();
+
+	while (m_ThreadRunning)
+	{
+		if (m_ThreadRunning)
+		{
+			boost::mutex::scoped_lock lock(m_UpdateMutex);
+			Wt::WApplication::UpdateLock uiLock(this);
+			if (uiLock)
+			{
+				m_UpdateEvent->emit();
+				enableUpdates(true);
+			}
+		}
+		boost::this_thread::sleep(boost::posix_time::milliseconds(frequency));
+	} 
+}
+
+void HelloApplication::UpdateEvent()
+{
+	ScrollGraphs();
+
+	char random [33];
+	sprintf(random,"%d",rand());
+	bigmoney->setText(Wt::WString(random));
+}
+
+void HelloApplication::ScrollGraphs()
+{
+	g_World->Get(model);
+	chart1->refresh();
+	//chart1->setModel(model);
+	//chart2->setModel(model);
+	//chart3->setModel(model);
+	//chart4->setModel(model);
+}
+
+HelloApplication::~HelloApplication()
+{
+	m_ThreadRunning = false;
+	m_UpdateThread.join();
+/*
+	delete controlsbox;
+
+	delete vspace;
+
+	delete bigmoney;
+
+	delete numberboxlayout;
+	delete numberbox;
+	delete sidebarlayout;
+	delete sidebar;
+
+	delete graph5;
+	delete graph4;
+	delete graph3;
+	delete graph2;
+	delete graph1;
+
+	delete graphslayout;
+	delete graphsbox;
+	delete rootlayout;
+*/
 }
 
 

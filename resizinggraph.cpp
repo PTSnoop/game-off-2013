@@ -7,8 +7,6 @@
 
 #include <boost/thread.hpp>
 
-//#include "WtGraphApp.h" 
-
 using namespace std;
 using namespace Wt;
 
