@@ -3,10 +3,14 @@
 class Score
 {
 public:
-	int reds;
-	int greens;
-	int blues;
-	int teals;
-	int blacks;
-	int total();
-}
+	Score();
+	Score(Score&);
+	float reds;
+	float greens;
+	float blues;
+	float teals;
+	float blacks;
+	float total();
+	Score copy();
+	void print();
+};

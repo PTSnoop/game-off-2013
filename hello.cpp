@@ -25,12 +25,16 @@
 #include <Wt/WHBoxLayout>
 #include <Wt/WApplication>
 #include <Wt/WContainerWidget>
+#include <Wt/WSlider>
 #include <Wt/WTimer>
+
+#include <Wt/WBootstrapTheme>
 
 #include <boost/thread.hpp>
 
 #include "world.h"
 #include "circle.h"
+#include "score.h"
 
 using namespace std;
 using namespace Wt;
@@ -43,8 +47,30 @@ public:
 	HelloApplication(const WEnvironment& env);
 	~HelloApplication();
 
-private:
+	void Slider1Slid(int slider);
+	void Slider2Slid(int slider);
+	void Slider3Slid(int slider);
+	void Slider4Slid(int slider);
+	void Slider5Slid(int slider);
+	void SlidersSlid(float,float,float,float,float);
+	void labelSliders();
 
+	Score currentScore;
+	Score potentialScore;
+
+	float cost1;
+	float cost2;
+	float cost3;
+	float cost4;
+	float cost5;
+
+	float totalWorth();
+	float totalPotentialWorth();
+
+	void Reset();
+	void Trade();
+
+private:
 
 	Wt::WHBoxLayout *rootlayout;
 	Wt::WContainerWidget* graphsbox;
@@ -110,6 +136,18 @@ private:
 	Wt::WText* line5current;
 	Wt::WText* line5value;
 
+	Wt::WSlider *slider1;
+	Wt::WSlider *slider2;
+	Wt::WSlider *slider3;
+	Wt::WSlider *slider4;
+	Wt::WSlider *slider5;
+
+	Wt::WText* slider1label;
+	Wt::WText* slider2label;
+	Wt::WText* slider3label;
+	Wt::WText* slider4label;
+	Wt::WText* slider5label;
+
 	Wt::WTimer *timer;
 
 	boost::thread m_UpdateThread;
@@ -117,14 +155,33 @@ private:
 	bool m_ThreadRunning;
 	void Update(int);
 	void UpdateEvent();
-	void ScrollGraphs();
 };
+
+float HelloApplication::totalWorth()
+{
+	return (currentScore.reds*cost1) + (currentScore.greens*cost2) + (currentScore.blues*cost3) + (currentScore.teals*cost4) + (currentScore.blacks*cost5);
+}
+
+
+float HelloApplication::totalPotentialWorth()
+{
+	return (potentialScore.reds*cost1) + (potentialScore.greens*cost2) + (potentialScore.blues*cost3) + (potentialScore.teals*cost4) + (potentialScore.blacks*cost5);
+}
 
 HelloApplication::HelloApplication(const WEnvironment& env)
 : WApplication(env)
+, currentScore()
+, potentialScore()
 {
+
+	currentScore.blacks = 500.0;
+
+	potentialScore = currentScore.copy();
+
 	setTitle("Graphs Go Up And Down");
 	useStyleSheet("main.css");
+	setCssTheme("things2");
+	//setTheme(new WBootstrapTheme());
 
 	rootlayout = new Wt::WHBoxLayout();
 	rootlayout->setContentsMargins(10, 10, 10, 10);
@@ -185,54 +242,50 @@ HelloApplication::HelloApplication(const WEnvironment& env)
 	circ1box = new Wt::WContainerWidget();
 	circ1 = new SmallCircle(circ1box);
 	circ1->color = WColor(0xcb,0x2e,0x2e,255);
-	numberboxlayout->addWidget(circ1box,1,0,AlignCenter);
+	numberboxlayout->addWidget(circ1box,1,0,AlignCenter | AlignMiddle);
 	line1current = new Wt::WText(L"0.0");
-	numberboxlayout->addWidget(line1current,1,1,AlignCenter);
+	numberboxlayout->addWidget(line1current,1,1,AlignRight | AlignMiddle);
 	line1value = new Wt::WText(L"0.0");
-	numberboxlayout->addWidget(line1value,1,2,AlignCenter);
+	numberboxlayout->addWidget(line1value,1,2,AlignRight | AlignMiddle);
 
 	circ2box = new Wt::WContainerWidget();
 	circ2 = new SmallCircle(circ2box);
 	circ2->color = WColor(0x2f, 0xcb, 0x2e,255);
-	numberboxlayout->addWidget(circ2box,2,0,AlignCenter);
+	numberboxlayout->addWidget(circ2box,2,0,AlignCenter | AlignMiddle);
 	line2current = new Wt::WText(L"0.0");
-	numberboxlayout->addWidget(line2current,2,1,AlignCenter);
+	numberboxlayout->addWidget(line2current,2,1,AlignRight | AlignMiddle);
 	line2value = new Wt::WText(L"0.0");
-	numberboxlayout->addWidget(line2value,2,2,AlignCenter);
+	numberboxlayout->addWidget(line2value,2,2,AlignRight | AlignMiddle);
 
 	circ3box = new Wt::WContainerWidget();
 	circ3 = new SmallCircle(circ3box);
 	circ3->color = WColor(0x00, 0x45, 0x86,255);
-	numberboxlayout->addWidget(circ3box,3,0,AlignCenter);
+	numberboxlayout->addWidget(circ3box,3,0,AlignCenter | AlignMiddle);
 	line3current = new Wt::WText(L"0.0");
-	numberboxlayout->addWidget(line3current,3,1,AlignCenter);
+	numberboxlayout->addWidget(line3current,3,1,AlignRight | AlignMiddle);
 	line3value = new Wt::WText(L"0.0");
-	numberboxlayout->addWidget(line3value,3,2,AlignCenter);
+	numberboxlayout->addWidget(line3value,3,2,AlignRight | AlignMiddle);
 
 	circ4box = new Wt::WContainerWidget();
 	circ4 = new SmallCircle(circ4box);
 	circ4->color = WColor(0x2e, 0xc8, 0xce,255);
-	numberboxlayout->addWidget(circ4box,4,0,AlignCenter);
+	numberboxlayout->addWidget(circ4box,4,0,AlignCenter | AlignMiddle);
 	line4current = new Wt::WText(L"0.0");
-	numberboxlayout->addWidget(line4current,4,1,AlignCenter);
+	numberboxlayout->addWidget(line4current,4,1,AlignRight | AlignMiddle);
 	line4value = new Wt::WText(L"0.0");
-	numberboxlayout->addWidget(line4value,4,2,AlignCenter);
+	numberboxlayout->addWidget(line4value,4,2,AlignRight | AlignMiddle);
 
 	circ5box = new Wt::WContainerWidget();
 	circ5 = new SmallCircle(circ5box);
 	circ5->color = WColor(0x88,0x88,0x88,255);
-	numberboxlayout->addWidget(circ5box,5,0,AlignCenter);
+	numberboxlayout->addWidget(circ5box,5,0,AlignCenter | AlignMiddle);
 	line5current = new Wt::WText(L"1.0");
-	numberboxlayout->addWidget(line5current,5,1,AlignCenter);
+	numberboxlayout->addWidget(line5current,5,1,AlignRight | AlignMiddle);
 	line5value = new Wt::WText(L"500.0");
-	numberboxlayout->addWidget(line5value,5,2,AlignCenter);
+	numberboxlayout->addWidget(line5value,5,2,AlignRight | AlignMiddle);
 	
 	vspace = new Wt::WContainerWidget();
 	sidebarlayout->addWidget(vspace);
-
-	controlsbox = new Wt::WContainerWidget();
-	controlsbox->setStyleClass("whitebox");
-	sidebarlayout->addWidget(controlsbox);
 
 	model = new WStandardItemModel(100, 5, 0);
 	g_World->Get(model);
@@ -308,6 +361,96 @@ HelloApplication::HelloApplication(const WEnvironment& env)
 	graph4->setLayout(graph4layout);
 	graph4layout->addWidget(chart4,1);
 
+	controlsbox = new Wt::WContainerWidget();
+	controlsbox->setStyleClass("whitebox");
+	sidebarlayout->addWidget(controlsbox);
+
+	Wt::WVBoxLayout* controlsboxlayout = new Wt::WVBoxLayout();
+	controlsbox->setLayout(controlsboxlayout);
+	controlsboxlayout->setContentsMargins(20, 0, 20, 20);
+
+	Wt::WContainerWidget* controlsboxgridbox = new Wt::WContainerWidget();
+	controlsboxlayout->addWidget(controlsboxgridbox,1);
+	Wt::WGridLayout* controlsboxgrid = new Wt::WGridLayout();
+	controlsboxgridbox->setLayout(controlsboxgrid);
+
+	SmallCircle* ccirc1 = new SmallCircle(controlsbox);
+	ccirc1->color = WColor(0xcb,0x2e,0x2e,255);
+	controlsboxgrid->addWidget(ccirc1,0,0,AlignCenter | AlignMiddle);
+	SmallCircle* ccirc2 = new SmallCircle(controlsbox);
+	ccirc2->color = WColor(0x2f, 0xcb, 0x2e,255);
+	controlsboxgrid->addWidget(ccirc2,1,0,AlignCenter | AlignMiddle);
+	SmallCircle* ccirc3 = new SmallCircle(controlsbox);
+	ccirc3->color = WColor(0x00, 0x45, 0x86,255);
+	controlsboxgrid->addWidget(ccirc3,2,0,AlignCenter | AlignMiddle);
+	SmallCircle* ccirc4 = new SmallCircle(controlsbox);
+	ccirc4->color = WColor(0x2e, 0xc8, 0xce,255);
+	controlsboxgrid->addWidget(ccirc4,3,0,AlignCenter | AlignMiddle);
+	SmallCircle* ccirc5 = new SmallCircle(controlsbox);
+	ccirc5->color = WColor(0x88,0x88,0x88,255);
+	controlsboxgrid->addWidget(ccirc5,4,0,AlignCenter | AlignMiddle);
+
+	slider1 = new Wt::WSlider();
+	slider1->resize(150, 50);
+	slider1->setMinimum(0);
+	slider1->setMaximum(100);
+	slider1->setValue(0);
+	slider1->sliderMoved().connect(this,&HelloApplication::Slider1Slid);
+	controlsboxgrid->addWidget(slider1,0,1,AlignCenter | AlignMiddle);
+
+	slider2 = new Wt::WSlider();
+	slider2->resize(150, 50);
+	slider2->setMinimum(0);
+	slider2->setMaximum(100);
+	slider2->setValue(0);
+	slider2->sliderMoved().connect(this,&HelloApplication::Slider2Slid);
+	controlsboxgrid->addWidget(slider2,1,1,AlignCenter | AlignMiddle);
+
+	slider3 = new Wt::WSlider();
+	slider3->resize(150, 50);
+	slider3->setMinimum(0);
+	slider3->setMaximum(100);
+	slider3->setValue(0);
+	slider3->sliderMoved().connect(this,&HelloApplication::Slider3Slid);
+	controlsboxgrid->addWidget(slider3,2,1,AlignCenter | AlignMiddle);
+
+	slider4 = new Wt::WSlider();
+	slider4->resize(150, 50);
+	slider4->setMinimum(0);
+	slider4->setMaximum(100);
+	slider4->setValue(0);
+	slider4->sliderMoved().connect(this,&HelloApplication::Slider4Slid);
+	controlsboxgrid->addWidget(slider4,3,1,AlignCenter | AlignMiddle);
+
+	slider5 = new Wt::WSlider();
+	slider5->resize(150, 50);
+	slider5->setMinimum(0);
+	slider5->setMaximum(100);
+	slider5->setValue(100);
+	slider5->sliderMoved().connect(this,&HelloApplication::Slider5Slid);
+	controlsboxgrid->addWidget(slider5,4,1,AlignCenter | AlignMiddle);
+
+	slider1label = new Wt::WText(L"   ");
+	controlsboxgrid->addWidget(slider1label,0,2,AlignRight | AlignMiddle);
+	slider2label = new Wt::WText(L"   ");
+	controlsboxgrid->addWidget(slider2label,1,2,AlignRight | AlignMiddle);
+	slider3label = new Wt::WText(L"   ");
+	controlsboxgrid->addWidget(slider3label,2,2,AlignRight | AlignMiddle);
+	slider4label = new Wt::WText(L"   ");
+	controlsboxgrid->addWidget(slider4label,3,2,AlignRight | AlignMiddle);
+	slider5label = new Wt::WText(L"   ");
+	controlsboxgrid->addWidget(slider5label,4,2,AlignRight | AlignMiddle);
+
+	Wt::WPushButton *resetbutton = new Wt::WPushButton("Reset");
+	resetbutton->setStyleClass("button");
+	resetbutton->clicked().connect(this,&HelloApplication::Reset);
+	Wt::WPushButton *buybutton = new Wt::WPushButton("Trade");
+	buybutton->setStyleClass("button");
+	buybutton->clicked().connect(this,&HelloApplication::Trade);
+	controlsboxlayout->addWidget(resetbutton);
+	controlsboxlayout->addWidget(buybutton);
+
+	UpdateEvent();
 	timer = new Wt::WTimer();
 	timer->setInterval(1000);
 	timer->timeout().connect(this, &HelloApplication::UpdateEvent);
@@ -318,6 +461,250 @@ HelloApplication::HelloApplication(const WEnvironment& env)
 
 	//m_ThreadRunning = true;
 	//m_UpdateThread = boost::thread(boost::bind(&HelloApplication::Update, this, 1000));
+}
+
+void HelloApplication::Reset()
+{
+	potentialScore = currentScore.copy();
+	UpdateEvent();
+	slider1label->setText("   ");
+	slider2label->setText("   ");
+	slider3label->setText("   ");
+	slider4label->setText("   ");
+	slider5label->setText("   ");
+}
+
+void HelloApplication::Trade()
+{
+	currentScore = potentialScore.copy();
+	UpdateEvent();
+	slider1label->setText("   ");
+	slider2label->setText("   ");
+	slider3label->setText("   ");
+	slider4label->setText("   ");
+	slider5label->setText("   ");
+}
+
+void HelloApplication::Slider1Slid(int s1)
+{
+	float s2 = slider2->value();
+	float s3 = slider3->value();
+	float s4 = slider4->value();
+	float s5 = slider5->value();
+
+	float totalPerc = s1+s2+s3+s4+s5;
+
+	while (totalPerc <= 99.0)
+	{
+		s5 += 0.1;
+		totalPerc = s1+s2+s3+s4+s5;
+	}
+
+	while (totalPerc > 101.0)
+	{
+		s2 *= 0.99;
+		s3 *= 0.99;
+		s4 *= 0.99;
+		s5 *= 0.99;
+		totalPerc = s1+s2+s3+s4+s5;
+	}
+	slider2->setValue(s2);
+	slider3->setValue(s3);
+	slider4->setValue(s4);
+	slider5->setValue(s5);
+	SlidersSlid(s1,s2,s3,s4,s5);
+}
+void HelloApplication::Slider2Slid(int s2)
+{
+	float s1 = slider1->value();
+	float s3 = slider3->value();
+	float s4 = slider4->value();
+	float s5 = slider5->value();
+
+	float totalPerc = s1+s2+s3+s4+s5;
+
+	while (totalPerc <= 99.0)
+	{
+		s5 += 0.1;
+		totalPerc = s1+s2+s3+s4+s5;
+	}
+
+	while (totalPerc > 101.0)
+	{
+		s1 *= 0.99;
+		s3 *= 0.99;
+		s4 *= 0.99;
+		s5 *= 0.99;
+		totalPerc = s1+s2+s3+s4+s5;
+	}
+	slider1->setValue(s1);
+	slider3->setValue(s3);
+	slider4->setValue(s4);
+	slider5->setValue(s5);
+	SlidersSlid(s1,s2,s3,s4,s5);
+}
+void HelloApplication::Slider3Slid(int s3)
+{
+	float s2 = slider2->value();
+	float s1 = slider1->value();
+	float s4 = slider4->value();
+	float s5 = slider5->value();
+
+	float totalPerc = s1+s2+s3+s4+s5;
+
+	while (totalPerc <= 99.0)
+	{
+		s5 += 0.1;
+		totalPerc = s1+s2+s3+s4+s5;
+	}
+
+	while (totalPerc > 101.0)
+	{
+		s1 *= 0.99;
+		s2 *= 0.99;
+		s4 *= 0.99;
+		s5 *= 0.99;
+		totalPerc = s1+s2+s3+s4+s5;
+	}
+	slider2->setValue(s2);
+	slider1->setValue(s1);
+	slider4->setValue(s4);
+	slider5->setValue(s5);
+	SlidersSlid(s1,s2,s3,s4,s5);
+}
+void HelloApplication::Slider4Slid(int s4)
+{
+	float s2 = slider2->value();
+	float s3 = slider3->value();
+	float s1 = slider1->value();
+	float s5 = slider5->value();
+
+	float totalPerc = s1+s2+s3+s4+s5;
+
+	while (totalPerc <= 99.0)
+	{
+		s5 += 0.1;
+		totalPerc = s1+s2+s3+s4+s5;
+	}
+
+	while (totalPerc > 101.0)
+	{
+		s2 *= 0.99;
+		s3 *= 0.99;
+		s1 *= 0.99;
+		s5 *= 0.99;
+		totalPerc = s1+s2+s3+s4+s5;
+	}
+	slider2->setValue(s2);
+	slider3->setValue(s3);
+	slider1->setValue(s1);
+	slider5->setValue(s5);
+	SlidersSlid(s1,s2,s3,s4,s5);
+}
+void HelloApplication::Slider5Slid(int s5)
+{
+	float s2 = slider2->value();
+	float s3 = slider3->value();
+	float s4 = slider4->value();
+	float s1 = slider1->value();
+
+	float totalPerc = s1+s2+s3+s4+s5;
+
+	while (totalPerc <= 99.0)
+	{
+		s2 += 0.1;
+		s3 += 0.1;
+		s4 += 0.1;
+		s1 += 0.1;
+		totalPerc = s1+s2+s3+s4+s5;
+	}
+
+	while (totalPerc > 101.0)
+	{
+		s2 *= 0.99;
+		s3 *= 0.99;
+		s4 *= 0.99;
+		s1 *= 0.99;
+		totalPerc = s1+s2+s3+s4+s5;
+	}
+	slider2->setValue(s2);
+	slider3->setValue(s3);
+	slider4->setValue(s4);
+	slider1->setValue(s1);
+	SlidersSlid(s1,s2,s3,s4,s5);
+}
+
+void HelloApplication::SlidersSlid(float s1, float s2, float s3, float s4, float s5)
+{
+	float hundred = s1+s2+s3+s4+s5;
+	potentialScore.reds =   (s1/hundred) * totalPotentialWorth() / cost1;
+	potentialScore.greens = (s2/hundred) * totalPotentialWorth() / cost2;
+	potentialScore.blues =  (s3/hundred) * totalPotentialWorth() / cost3;
+	potentialScore.teals =  (s4/hundred) * totalPotentialWorth() / cost4;
+	potentialScore.blacks = (s5/hundred) * totalPotentialWorth() / cost5;
+	
+	labelSliders();
+}
+
+void HelloApplication::labelSliders()
+{
+	char buffer [64];
+
+	float gain1 = (potentialScore.reds - currentScore.reds)*cost1;
+	if (gain1 > 0.1 || gain1 < -0.1)
+	{
+		sprintf(buffer,"%+0.01f",gain1);
+		slider1label->setText(buffer);
+	}
+	else
+	{
+		slider1label->setText("   ");
+	}
+
+	float gain2 = (potentialScore.greens - currentScore.greens)*cost2;
+	if (gain2 > 0.1 || gain2 < -0.1)
+	{
+		sprintf(buffer,"%+0.01f",gain2);
+		slider2label->setText(buffer);
+	}
+	else
+	{
+		slider2label->setText("   ");
+	}
+
+	float gain3 = (potentialScore.blues - currentScore.blues)*cost3;
+	if (gain3 > 0.1 || gain3 < -0.1)
+	{
+		sprintf(buffer,"%+0.01f",gain3);
+		slider3label->setText(buffer);
+	}
+	else
+	{
+		slider3label->setText("   ");
+	}
+
+	float gain4 = (potentialScore.teals - currentScore.teals)*cost4;
+	if (gain4 > 0.1 || gain4 < -0.1)
+	{
+		sprintf(buffer,"%+0.01f",gain4);
+		slider4label->setText(buffer);
+	}
+	else
+	{
+		slider4label->setText("   ");
+	}
+
+	float gain5 = (potentialScore.blacks - currentScore.blacks)*cost5;
+	if (gain5 > 0.1 || gain5 < -0.1)
+	{
+		sprintf(buffer,"%+0.01f",gain5);
+		slider5label->setText(buffer);
+	}
+	else
+	{
+		slider5label->setText("   ");
+	}
+
 }
 
 void HelloApplication::Update(int frequency)
@@ -342,37 +729,57 @@ void HelloApplication::Update(int frequency)
 	} 
 }
 
-void HelloApplication::UpdateEvent()
-{
-	ScrollGraphs();
-
-}
-
-void SetStandardItemLabel(Wt::WText* label, Wt::WStandardItem* item)
+float GetValueFromModelItem(Wt::WStandardItem* item)
 {
 	std::string data1 = item->text().toUTF8();
-	float float1 = atof(data1.c_str());
-
-	char buffer [16];
-	sprintf(buffer,"%0.01f",float1);
-	label->setText(buffer);
-
-	
+	return atof(data1.c_str());
 }
 
-void HelloApplication::ScrollGraphs()
+void HelloApplication::UpdateEvent()
 {
 	g_World->Get(model);
 
-	SetStandardItemLabel(line1current,model->item(99,1));
-	SetStandardItemLabel(line2current,model->item(99,2));
-	SetStandardItemLabel(line3current,model->item(99,3));
-	SetStandardItemLabel(line4current,model->item(99,4));
-	
-	//chart1->setModel(model);
-	//chart2->setModel(model);
-	//chart3->setModel(model);
-	//chart4->setModel(model);
+	cost1 = GetValueFromModelItem(model->item(99,1));
+	cost2 = GetValueFromModelItem(model->item(99,2));
+	cost3 = GetValueFromModelItem(model->item(99,3));
+	cost4 = GetValueFromModelItem(model->item(99,4));
+	cost5 = 1.0;
+
+	char buffer [64];
+
+	sprintf(buffer,"%0.01f",cost1);
+	line1current->setText(buffer);
+	sprintf(buffer,"%0.01f",cost2);
+	line2current->setText(buffer);
+	sprintf(buffer,"%0.01f",cost3);
+	line3current->setText(buffer);
+	sprintf(buffer,"%0.01f",cost4);
+	line4current->setText(buffer);
+	sprintf(buffer,"%0.01f",cost5);
+	line5current->setText(buffer);
+
+	sprintf(buffer,"%0.01f",currentScore.reds*cost1);
+	line1value->setText(buffer);
+	sprintf(buffer,"%0.01f",currentScore.greens*cost2);
+	line2value->setText(buffer);
+	sprintf(buffer,"%0.01f",currentScore.blues*cost3);
+	line3value->setText(buffer);
+	sprintf(buffer,"%0.01f",currentScore.teals*cost4);
+	line4value->setText(buffer);
+	sprintf(buffer,"%0.01f",currentScore.blacks*cost5);
+	line5value->setText(buffer);
+
+	sprintf(buffer,"%0.01f",totalWorth());
+	bigmoney->setText(buffer);
+
+	float hundred = slider1->value() + slider2->value() + slider3->value() + slider4->value() + slider5->value();
+	slider1->setValue(hundred * (potentialScore.reds	*cost1/totalPotentialWorth()));
+	slider2->setValue(hundred * (potentialScore.greens	*cost2/totalPotentialWorth()));
+	slider3->setValue(hundred * (potentialScore.blues	*cost3/totalPotentialWorth()));
+	slider4->setValue(hundred * (potentialScore.teals	*cost4/totalPotentialWorth()));
+	slider5->setValue(hundred * (potentialScore.blacks	*cost5/totalPotentialWorth()));
+
+	labelSliders();
 }
 
 HelloApplication::~HelloApplication()
