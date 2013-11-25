@@ -28,8 +28,6 @@
 #include <Wt/WSlider>
 #include <Wt/WTimer>
 
-#include <Wt/WBootstrapTheme>
-
 #include <boost/thread.hpp>
 
 #include "world.h"
@@ -181,7 +179,6 @@ HelloApplication::HelloApplication(const WEnvironment& env)
 	setTitle("Graphs Go Up And Down");
 	useStyleSheet("main.css");
 	setCssTheme("things2");
-	//setTheme(new WBootstrapTheme());
 
 	rootlayout = new Wt::WHBoxLayout();
 	rootlayout->setContentsMargins(10, 10, 10, 10);
