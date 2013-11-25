@@ -230,59 +230,62 @@ HelloApplication::HelloApplication(const WEnvironment& env)
 
 	bigmoney = new Wt::WText(L"265.9");
 	bigmoney->setStyleClass("bigmoney");
-	//bigmoneybox = new Wt::WContainerWidget();
-	//bigmoneybox->addWidget(bigmoney);
-	numberboxboxlayout->addWidget(bigmoney);//box);
+	bigmoneybox = new Wt::WContainerWidget();
+	Wt::WVBoxLayout* bigmoneyboxlayout = new Wt::WVBoxLayout();
+	bigmoneyboxlayout->setContentsMargins(0, 0, 0, 0);
+	bigmoneybox->setLayout(bigmoneyboxlayout);
+	bigmoneyboxlayout->addWidget(bigmoney,1,AlignCenter);
+	numberboxboxlayout->addWidget(bigmoneybox);
 
-	numberboxboxlayout->addWidget(numberbox,1);
+	numberboxboxlayout->addWidget(numberbox,2);
 
 	circ1box = new Wt::WContainerWidget();
 	circ1 = new SmallCircle(circ1box);
 	circ1->color = WColor(0xcb,0x2e,0x2e,255);
-	numberboxlayout->addWidget(circ1box,1,0,AlignCenter | AlignMiddle);
+	numberboxlayout->addWidget(circ1box,0,0,AlignCenter | AlignMiddle);
 	line1current = new Wt::WText(L"0.0");
-	numberboxlayout->addWidget(line1current,1,1,AlignRight | AlignMiddle);
+	numberboxlayout->addWidget(line1current,0,1,AlignRight | AlignMiddle);
 	line1value = new Wt::WText(L"0.0");
-	numberboxlayout->addWidget(line1value,1,2,AlignRight | AlignMiddle);
+	numberboxlayout->addWidget(line1value,0,2,AlignRight | AlignMiddle);
 
 	circ2box = new Wt::WContainerWidget();
 	circ2 = new SmallCircle(circ2box);
 	circ2->color = WColor(0x2f, 0xcb, 0x2e,255);
-	numberboxlayout->addWidget(circ2box,2,0,AlignCenter | AlignMiddle);
+	numberboxlayout->addWidget(circ2box,1,0,AlignCenter | AlignMiddle);
 	line2current = new Wt::WText(L"0.0");
-	numberboxlayout->addWidget(line2current,2,1,AlignRight | AlignMiddle);
+	numberboxlayout->addWidget(line2current,1,1,AlignRight | AlignMiddle);
 	line2value = new Wt::WText(L"0.0");
-	numberboxlayout->addWidget(line2value,2,2,AlignRight | AlignMiddle);
+	numberboxlayout->addWidget(line2value,1,2,AlignRight | AlignMiddle);
 
 	circ3box = new Wt::WContainerWidget();
 	circ3 = new SmallCircle(circ3box);
 	circ3->color = WColor(0x00, 0x45, 0x86,255);
-	numberboxlayout->addWidget(circ3box,3,0,AlignCenter | AlignMiddle);
+	numberboxlayout->addWidget(circ3box,2,0,AlignCenter | AlignMiddle);
 	line3current = new Wt::WText(L"0.0");
-	numberboxlayout->addWidget(line3current,3,1,AlignRight | AlignMiddle);
+	numberboxlayout->addWidget(line3current,2,1,AlignRight | AlignMiddle);
 	line3value = new Wt::WText(L"0.0");
-	numberboxlayout->addWidget(line3value,3,2,AlignRight | AlignMiddle);
+	numberboxlayout->addWidget(line3value,2,2,AlignRight | AlignMiddle);
 
 	circ4box = new Wt::WContainerWidget();
 	circ4 = new SmallCircle(circ4box);
 	circ4->color = WColor(0x2e, 0xc8, 0xce,255);
-	numberboxlayout->addWidget(circ4box,4,0,AlignCenter | AlignMiddle);
+	numberboxlayout->addWidget(circ4box,3,0,AlignCenter | AlignMiddle);
 	line4current = new Wt::WText(L"0.0");
-	numberboxlayout->addWidget(line4current,4,1,AlignRight | AlignMiddle);
+	numberboxlayout->addWidget(line4current,3,1,AlignRight | AlignMiddle);
 	line4value = new Wt::WText(L"0.0");
-	numberboxlayout->addWidget(line4value,4,2,AlignRight | AlignMiddle);
+	numberboxlayout->addWidget(line4value,3,2,AlignRight | AlignMiddle);
 
 	circ5box = new Wt::WContainerWidget();
 	circ5 = new SmallCircle(circ5box);
 	circ5->color = WColor(0x88,0x88,0x88,255);
-	numberboxlayout->addWidget(circ5box,5,0,AlignCenter | AlignMiddle);
+	numberboxlayout->addWidget(circ5box,4,0,AlignCenter | AlignMiddle);
 	line5current = new Wt::WText(L"1.0");
-	numberboxlayout->addWidget(line5current,5,1,AlignRight | AlignMiddle);
+	numberboxlayout->addWidget(line5current,4,1,AlignRight | AlignMiddle);
 	line5value = new Wt::WText(L"500.0");
-	numberboxlayout->addWidget(line5value,5,2,AlignRight | AlignMiddle);
+	numberboxlayout->addWidget(line5value,4,2,AlignRight | AlignMiddle);
 	
 	vspace = new Wt::WContainerWidget();
-	sidebarlayout->addWidget(vspace);
+	sidebarlayout->addWidget(vspace,1);
 
 	model = new WStandardItemModel(100, 5, 0);
 	g_World->Get(model);
@@ -444,7 +447,7 @@ HelloApplication::HelloApplication(const WEnvironment& env)
 	Wt::WPushButton *buybutton = new Wt::WPushButton("Trade");
 	buybutton->setStyleClass("button");
 	buybutton->clicked().connect(this,&HelloApplication::Trade);
-	controlsboxlayout->addWidget(resetbutton);
+	controlsboxlayout->addWidget(resetbutton,1);
 	controlsboxlayout->addWidget(buybutton);
 
 	UpdateEvent();
