@@ -43,7 +43,7 @@ void World::init()
 		
 	}
 	m_ThreadRunning = true;
-	m_WorldUpdate = boost::thread(boost::bind(&World::Update, this, 1000));
+	m_WorldUpdate = boost::thread(boost::bind(&World::Update, this, 3000));
 }
 
 /*

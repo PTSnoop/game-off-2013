@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include <Wt/WApplication>
 #include <Wt/WBreak>
@@ -37,8 +38,6 @@
 using namespace std;
 using namespace Wt;
 
-World* g_World;
-
 class HelloApplication : public WApplication
 {
 public:
@@ -67,6 +66,8 @@ public:
 
 	void Reset();
 	void Trade();
+
+	World* g_World;
 
 private:
 
@@ -171,6 +172,8 @@ HelloApplication::HelloApplication(const WEnvironment& env)
 , currentScore()
 , potentialScore()
 {
+	g_World = new World();
+	g_World->init();
 
 	currentScore.blacks = 500.0;
 
@@ -447,7 +450,7 @@ HelloApplication::HelloApplication(const WEnvironment& env)
 	Wt::WPushButton *buybutton = new Wt::WPushButton("Trade");
 	buybutton->setStyleClass("button");
 	buybutton->clicked().connect(this,&HelloApplication::Trade);
-	controlsboxlayout->addWidget(resetbutton,1);
+	controlsboxlayout->addWidget(resetbutton);
 	controlsboxlayout->addWidget(buybutton);
 
 	UpdateEvent();
@@ -466,23 +469,35 @@ HelloApplication::HelloApplication(const WEnvironment& env)
 void HelloApplication::Reset()
 {
 	potentialScore = currentScore.copy();
-	UpdateEvent();
-	slider1label->setText("   ");
-	slider2label->setText("   ");
-	slider3label->setText("   ");
-	slider4label->setText("   ");
-	slider5label->setText("   ");
+	float hundred = 100; // This made sense in context, honest
+	float s1 = hundred * (potentialScore.reds	*cost1/totalPotentialWorth());
+	float s2 = (hundred * (potentialScore.greens	*cost2/totalPotentialWorth()));
+	float s3 = (hundred * (potentialScore.blues	*cost3/totalPotentialWorth()));
+	float s4 = (hundred * (potentialScore.teals	*cost4/totalPotentialWorth()));
+	float s5 = (hundred * (potentialScore.blacks	*cost5/totalPotentialWorth()));
+	slider1->setValue(s1);
+	slider2->setValue(s2);
+	slider3->setValue(s3);
+	slider4->setValue(s4);
+	slider5->setValue(s5);
+	SlidersSlid(s1,s2,s3,s4,s5);
+
+	//slider1label->setText("   ");
+	//slider2label->setText("   ");
+	//slider3label->setText("   ");
+	//slider4label->setText("   ");
+	//slider5label->setText("   ");
 }
 
 void HelloApplication::Trade()
 {
 	currentScore = potentialScore.copy();
-	UpdateEvent();
-	slider1label->setText("   ");
-	slider2label->setText("   ");
-	slider3label->setText("   ");
-	slider4label->setText("   ");
-	slider5label->setText("   ");
+	SlidersSlid(slider1->value(),slider2->value(),slider3->value(),slider4->value(),slider5->value());
+	//slider1label->setText("   ");
+	//slider2label->setText("   ");
+	//slider3label->setText("   ");
+	//slider4label->setText("   ");
+	//slider5label->setText("   ");
 }
 
 void HelloApplication::Slider1Slid(int s1)
@@ -637,11 +652,11 @@ void HelloApplication::Slider5Slid(int s5)
 void HelloApplication::SlidersSlid(float s1, float s2, float s3, float s4, float s5)
 {
 	float hundred = s1+s2+s3+s4+s5;
-	potentialScore.reds =   (s1/hundred) * totalPotentialWorth() / cost1;
-	potentialScore.greens = (s2/hundred) * totalPotentialWorth() / cost2;
-	potentialScore.blues =  (s3/hundred) * totalPotentialWorth() / cost3;
-	potentialScore.teals =  (s4/hundred) * totalPotentialWorth() / cost4;
-	potentialScore.blacks = (s5/hundred) * totalPotentialWorth() / cost5;
+	potentialScore.reds =   (s1/hundred) * totalWorth() / cost1;
+	potentialScore.greens = (s2/hundred) * totalWorth() / cost2;
+	potentialScore.blues =  (s3/hundred) * totalWorth() / cost3;
+	potentialScore.teals =  (s4/hundred) * totalWorth() / cost4;
+	potentialScore.blacks = (s5/hundred) * totalWorth() / cost5;
 	
 	labelSliders();
 }
@@ -772,12 +787,14 @@ void HelloApplication::UpdateEvent()
 	sprintf(buffer,"%0.01f",totalWorth());
 	bigmoney->setText(buffer);
 
-	float hundred = slider1->value() + slider2->value() + slider3->value() + slider4->value() + slider5->value();
-	slider1->setValue(hundred * (potentialScore.reds	*cost1/totalPotentialWorth()));
-	slider2->setValue(hundred * (potentialScore.greens	*cost2/totalPotentialWorth()));
-	slider3->setValue(hundred * (potentialScore.blues	*cost3/totalPotentialWorth()));
-	slider4->setValue(hundred * (potentialScore.teals	*cost4/totalPotentialWorth()));
-	slider5->setValue(hundred * (potentialScore.blacks	*cost5/totalPotentialWorth()));
+	SlidersSlid(slider1->value(),slider2->value(),slider3->value(),slider4->value(),slider5->value());
+
+	//float hundred = slider1->value() + slider2->value() + slider3->value() + slider4->value() + slider5->value();
+	//slider1->setValue(hundred * (potentialScore.reds	*cost1/totalPotentialWorth()));
+	//slider2->setValue(hundred * (potentialScore.greens	*cost2/totalPotentialWorth()));
+	//slider3->setValue(hundred * (potentialScore.blues	*cost3/totalPotentialWorth()));
+	//slider4->setValue(hundred * (potentialScore.teals	*cost4/totalPotentialWorth()));
+	//slider5->setValue(hundred * (potentialScore.blacks	*cost5/totalPotentialWorth()));
 
 	labelSliders();
 }
@@ -786,6 +803,8 @@ HelloApplication::~HelloApplication()
 {
 	m_ThreadRunning = false;
 	m_UpdateThread.join();
+
+	delete g_World;
 /*
 	delete controlsbox;
 
@@ -818,8 +837,7 @@ WApplication *createApplication(const WEnvironment& env)
 
 int main(int argc, char **argv)
 {
-	g_World = new World();
-	g_World->init();
+	srand(time(NULL));
 	return WRun(argc, argv, &createApplication);
 }
 
