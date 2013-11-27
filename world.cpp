@@ -41,10 +41,10 @@ void World::init()
 		float logline3 = log(iLine3);
 		float logline4 = log(iLine4);
 
-		logline1 += ((rand()%20) - 9.0)/1000.0;
-		logline2 += ((rand()%20) - 9.0)/1000.0;
-		logline3 += ((rand()%20) - 9.0)/1000.0;
-		logline4 += ((rand()%20) - 9.0)/1000.0;
+		logline1 += ((rand()%20) - 9.0)/200.0;
+		logline2 += ((rand()%20) - 9.0)/200.0;
+		logline3 += ((rand()%20) - 9.0)/200.0;
+		logline4 += ((rand()%20) - 9.0)/200.0;
 
 		iLine0 += 1;
 		iLine1 = exp(logline1);
@@ -99,10 +99,10 @@ void World::Update()
 			float logline3 = log(m_Line3.back());
 			float logline4 = log(m_Line4.back());
 
-                	logline1 += ((rand()%20) - 9.0)/1000.0;
-                	logline2 += ((rand()%20) - 9.0)/1000.0;
-                	logline3 += ((rand()%20) - 9.0)/1000.0;
-                	logline4 += ((rand()%20) - 9.0)/1000.0;
+                	logline1 += ((rand()%20) - 9.0)/200.0;
+                	logline2 += ((rand()%20) - 9.0)/200.0;
+                	logline3 += ((rand()%20) - 9.0)/200.0;
+                	logline4 += ((rand()%20) - 9.0)/200.0;
 
 	                m_Line1.push_back(exp(logline1));
 	                m_Line2.push_back(exp(logline2));
