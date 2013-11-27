@@ -20,11 +20,11 @@ public:
 
 private:
 	std::deque<std::time_t> m_Times;
-	std::deque<int> m_Line0;
-	std::deque<int> m_Line1;
-	std::deque<int> m_Line2;
-	std::deque<int> m_Line3;
-	std::deque<int> m_Line4;
+	std::deque<float> m_Line0;
+	std::deque<float> m_Line1;
+	std::deque<float> m_Line2;
+	std::deque<float> m_Line3;
+	std::deque<float> m_Line4;
 
 	boost::mutex m_UpdateMutex;
 	bool m_ThreadRunning;
