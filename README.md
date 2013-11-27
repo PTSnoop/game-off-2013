@@ -1,3 +1,5 @@
+![Screenshot]{http://sasha.sector-alpha.net/~ptsnoop/graphs/screenshot.png}
+
 ## Graphs Go Up And Down
 
 An economic simulation game. 
