@@ -1,7 +1,9 @@
 ## Graphs Go Up And Down
 
-An economic simulation game.
+An economic simulation game. 
 
-Nothing much to see here yet. I'm expecting this to be more of a teach-myself-the-wt-framework exercise than an actual thoroughly polished game - but who knows, maybe something playable will emerge.
+Four different commodities (or maybe currencies, or possibly just colours) go up and down over time.
 
-Made using the [Wt framework](http://www.webtoolkit.eu/) (think Qt, but webbish). All code here is available under GNU GPLv3.
+Made using the [Wt framework](http://www.webtoolkit.eu/) (think Qt, but webbish). Almost everything in the /resources folder was taken straight from the Wt source, just replicated here for convenience.
+
+All code here is available under GNU GPLv3.

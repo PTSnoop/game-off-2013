@@ -239,7 +239,7 @@ HelloApplication::HelloApplication(const WEnvironment& env)
 	Wt::WVBoxLayout* bigmoneyboxlayout = new Wt::WVBoxLayout();
 	bigmoneyboxlayout->setContentsMargins(0, 0, 0, 0);
 	bigmoneybox->setLayout(bigmoneyboxlayout);
-	bigmoneyboxlayout->addWidget(bigmoney,1,AlignCenter);
+	bigmoneyboxlayout->addWidget(bigmoney,AlignCenter);
 	numberboxboxlayout->addWidget(bigmoneybox);
 
 	numberboxboxlayout->addWidget(numberbox,2);
