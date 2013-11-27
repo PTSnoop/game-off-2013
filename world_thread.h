@@ -16,7 +16,6 @@ public:
 	~World();
 	void init();
 	void Get(Wt::WStandardItemModel* model);
-	void Update();
 
 private:
 	std::deque<std::time_t> m_Times;
@@ -26,7 +25,9 @@ private:
 	std::deque<int> m_Line3;
 	std::deque<int> m_Line4;
 
+	boost::thread m_WorldUpdate;
 	boost::mutex m_UpdateMutex;
 	bool m_ThreadRunning;
+	void Update(int);
 
 };

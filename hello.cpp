@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <iostream>
 
 #include <Wt/WApplication>
 #include <Wt/WBreak>
@@ -68,6 +69,7 @@ public:
 	void Trade();
 
 	World* g_World;
+	int updates;
 
 private:
 
@@ -752,6 +754,9 @@ float GetValueFromModelItem(Wt::WStandardItem* item)
 
 void HelloApplication::UpdateEvent()
 {
+	updates++;
+	//std::cerr << updates << std::endl;
+	g_World->Update();
 	g_World->Get(model);
 
 	cost1 = GetValueFromModelItem(model->item(99,1));
@@ -785,6 +790,7 @@ void HelloApplication::UpdateEvent()
 	line5value->setText(buffer);
 
 	sprintf(buffer,"%0.01f",totalWorth());
+	//sprintf(buffer,"%d",updates);
 	bigmoney->setText(buffer);
 
 	SlidersSlid(slider1->value(),slider2->value(),slider3->value(),slider4->value(),slider5->value());
